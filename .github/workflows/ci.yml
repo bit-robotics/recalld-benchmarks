@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  patches:
+    name: Patch stack applies to pinned AMB
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Clone AMB at the pinned commit
+        run: |
+          set -euo pipefail
+          PINNED=$(grep -oP 'PINNED_COMMIT = "\K[0-9a-f]{40}' scripts/setup.py)
+          echo "Pinned commit: $PINNED"
+          git clone --quiet https://github.com/vectorize-io/agent-memory-benchmark amb-check
+          git -C amb-check checkout --quiet "$PINNED"
+
+      - name: Apply overlay and patches
+        run: |
+          set -euo pipefail
+          cp -r overlay/src/. amb-check/src/
+          for p in patches/*.patch; do
+            echo "==> $p"
+            git -C amb-check apply "../$p"
+          done
+
+      - name: Patched catalog.json is valid JSON with the expected providers
+        run: |
+          python - <<'PY'
+          import json, sys
+          catalog = json.load(open("amb-check/catalog.json", encoding="utf-8"))
+          providers = catalog["providers"]
+          expected = {"recalld", "recalld-recall", "mem0-oss"}
+          missing = expected - providers.keys()
+          if missing:
+              sys.exit(f"catalog.json missing providers: {sorted(missing)}")
+          print("catalog.json OK:", sorted(expected))
+          PY
+
+  results:
+    name: Committed reports reproduce the published numbers
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - run: python scripts/summarize_results.py
+
+  tests:
+    name: Adapter unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Set up the harness
+        run: uv run python scripts/setup.py
+
+      - name: Run adapter tests
+        working-directory: amb
+        run: uv run --with pytest pytest tests -q

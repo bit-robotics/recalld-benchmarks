@@ -1,0 +1,35 @@
+# --- Local working directories ---
+# The AMB harness clone, created by scripts/setup.py.
+amb/
+# Local archives and scratch runs.
+archive/
+memorybench/
+# Sweep state written by scripts/run_recalld_sweep.py.
+experiments/
+
+# --- Secrets ---
+# Environment files with real keys must never be committed.
+.env
+.env.*
+!.env.example
+# Google service-account key files (see GEMINI_BACKEND=vertex in .env.example).
+*sa-key*.json
+service-account*.json
+*.pem
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# --- Editors / OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

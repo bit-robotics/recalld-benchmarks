@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+title: recalld-benchmarks
+message: >-
+  If you reference these benchmark results, please cite this repository and
+  the underlying harness and dataset.
+type: software
+authors:
+  - name: Bit Robotics Ltd
+repository-code: https://github.com/bit-robotics/recalld-benchmarks
+license: MIT
+references:
+  - type: software
+    title: Agent Memory Benchmark (AMB)
+    authors:
+      - name: Vectorize
+    repository-code: https://github.com/vectorize-io/agent-memory-benchmark
+    notes: Harness, pinned at commit aa9273ab9e34bbeaff3c6ef2f694142a552d5b22
+  - type: conference-paper
+    title: Evaluating Very Long-Term Conversational Memory of LLM Agents
+    authors:
+      - family-names: Maharana
+        given-names: Adyasha
+      - family-names: Lee
+        given-names: Dong-Ho
+      - family-names: Tulyakov
+        given-names: Sergey
+      - family-names: Bansal
+        given-names: Mohit
+      - family-names: Barbieri
+        given-names: Francesco
+      - family-names: Fang
+        given-names: Yuwei
+    year: 2024
+    conference:
+      name: ACL 2024
+    url: https://arxiv.org/abs/2402.17753
+    repository-code: https://github.com/snap-research/locomo
+    license: CC-BY-NC-4.0
+    notes: LoCoMo dataset

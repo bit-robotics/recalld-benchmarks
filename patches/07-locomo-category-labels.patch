@@ -1,0 +1,28 @@
+diff --git a/src/memory_bench/dataset/locomo.py b/src/memory_bench/dataset/locomo.py
+--- a/src/memory_bench/dataset/locomo.py
++++ b/src/memory_bench/dataset/locomo.py
+@@ -20,8 +20,8 @@
+              gold_ids = sessions containing evidence turns
+ 
+ Categories (query-level, by QA category int):
+-  1 → single-hop   3 → multi-hop
+-  2 → temporal     4 → open-domain    5 → adversarial
++  1 → multi-hop    3 → open-domain
++  2 → temporal     4 → single-hop     5 → adversarial
+ """
+ import json
+ import urllib.request
+@@ -43,10 +43,10 @@
+ SPLITS = ["locomo10"]
+ 
+ _CATEGORY_NAMES = {
+-    1: "single-hop",
++    1: "multi-hop",
+     2: "temporal",
+-    3: "multi-hop",
+-    4: "open-domain",
++    3: "open-domain",
++    4: "single-hop",
+ }
+ 
+ _SKIP_CATEGORIES = {5}  # adversarial — excluded from benchmark

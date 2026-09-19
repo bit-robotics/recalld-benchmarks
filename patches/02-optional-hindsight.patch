@@ -1,0 +1,54 @@
+diff --git a/pyproject.toml b/pyproject.toml
+index dcb945b..c74c228 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -13,7 +13,6 @@ dependencies = [
+     "cognee>=0.5.4",
+     "sentence-transformers>=3.0",
+     "python-dotenv>=1.0",
+-    "hindsight-all>=0.4",
+     "supermemory>=0.1",
+     "httpx>=0.27",
+     "qdrant-client>=1.13",
+diff --git a/src/memory_bench/memory/__init__.py b/src/memory_bench/memory/__init__.py
+index 638b2e0..72c3b06 100644
+--- a/src/memory_bench/memory/__init__.py
++++ b/src/memory_bench/memory/__init__.py
+@@ -1,7 +1,10 @@
+ from .base import MemoryProvider
+ from .bm25 import BM25MemoryProvider
+ from .cognee import CogneeMemoryProvider
+-from .hindsight import HindsightCloudMemoryProvider, HindsightHTTPMemoryProvider, HindsightMemoryProvider
++try:
++    from .hindsight import HindsightCloudMemoryProvider, HindsightHTTPMemoryProvider, HindsightMemoryProvider
++except ImportError:  # hindsight-all has no Windows wheel; see patches/02-optional-hindsight.patch
++    HindsightCloudMemoryProvider = HindsightHTTPMemoryProvider = HindsightMemoryProvider = None  # type: ignore[misc, assignment]
+ from .mastra import MastraMemoryProvider
+ from .mastra_om import MastraOMMemoryProvider
+ from .mem0 import Mem0MemoryProvider
+@@ -15,10 +18,6 @@ from .supermemory import SupermemoryMemoryProvider
+ REGISTRY: dict[str, type[MemoryProvider]] = {
+     "bm25": BM25MemoryProvider,
+     "cognee": CogneeMemoryProvider,
+-    "hindsight": HindsightMemoryProvider,
+-    "hindsight-cloud": HindsightCloudMemoryProvider,
+-    "hindsight-http": HindsightHTTPMemoryProvider,
+-
+     "mastra": MastraMemoryProvider,
+     "mastra-om": MastraOMMemoryProvider,
+     "mem0": Mem0MemoryProvider,
+@@ -31,6 +30,14 @@ REGISTRY: dict[str, type[MemoryProvider]] = {
+     "mem0-oss": Mem0OssMemoryProvider,
+     "supermemory": SupermemoryMemoryProvider,
+ }
++if HindsightMemoryProvider is not None:
++    REGISTRY.update(
++        {
++            "hindsight": HindsightMemoryProvider,
++            "hindsight-cloud": HindsightCloudMemoryProvider,
++            "hindsight-http": HindsightHTTPMemoryProvider,
++        }
++    )
+ 
+ 
+ def get_memory_provider(name: str) -> MemoryProvider:

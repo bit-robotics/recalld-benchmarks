@@ -1,0 +1,37 @@
+diff --git a/src/memory_bench/modes/rag.py b/src/memory_bench/modes/rag.py
+index 3046505..00c5f22 100644
+--- a/src/memory_bench/modes/rag.py
++++ b/src/memory_bench/modes/rag.py
+@@ -1,4 +1,5 @@
+ import asyncio
++import json
+ import time
+ 
+ from .base import ResponseMode
+@@ -71,10 +72,11 @@ class RAGMode(ResponseMode):
+         else:
+             prompt = _DEFAULT_OPEN_PROMPT.format(context=context, query=query)
+         data = self._llm.generate(prompt, _OPEN_SCHEMA)
++        stored_context = json.dumps(raw_response) if prompt_fn and raw_response else context
+         return AnswerResult(
+             answer=data["answer"],
+             reasoning=data["reasoning"],
+-            context=context,
++            context=stored_context,
+             retrieve_time_ms=round(retrieve_ms, 1),
+             raw_response=raw_response,
+         )
+@@ -87,10 +89,11 @@ class RAGMode(ResponseMode):
+         else:
+             prompt = _DEFAULT_MCQ_PROMPT.format(context=context, query=query)
+         data = self._llm.generate(prompt, _MCQ_SCHEMA)
+         choice = data["choice"].strip().lower().strip("(). ")[:1]
++        stored_context = json.dumps(raw_response) if prompt_fn and raw_response else context
+         return AnswerResult(
+             answer=choice,
+             reasoning=data["reasoning"],
+-            context=context,
++            context=stored_context,
+             retrieve_time_ms=round(retrieve_ms, 1),
+             raw_response=raw_response,
+         )

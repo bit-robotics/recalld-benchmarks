@@ -1,0 +1,55 @@
+diff --git a/catalog.json b/catalog.json
+index 03fac76..cafd2e3 100644
+--- a/catalog.json
++++ b/catalog.json
+@@ -149,6 +149,27 @@
+       "kind": "cloud",
+       "link": "https://supermemory.ai",
+       "logo": "https://www.google.com/s2/favicons?sz=32&domain=supermemory.ai"
++    },
++    "recalld": {
++      "key": "recalld",
++      "description": "Recalld REST API: fact extraction + vector search (POST /memory/search).",
++      "kind": "cloud",
++      "link": "https://recalld.ai",
++      "logo": "https://www.google.com/s2/favicons?sz=32&domain=recalld.ai"
++    },
++    "recalld-recall": {
++      "key": "recalld-recall",
++      "description": "Recalld REST API: server-side LLM fact selection (POST /memory/recall). Use --mode rag.",
++      "kind": "cloud",
++      "link": "https://recalld.ai",
++      "logo": "https://www.google.com/s2/favicons?sz=32&domain=recalld.ai"
++    },
++    "mem0-oss": {
++      "key": "mem0-oss",
++      "description": "Mem0 OSS self-hosted REST server (v2.0.11 API). Not Mem0 cloud.",
++      "kind": "cloud",
++      "link": "https://github.com/mem0ai/mem0",
++      "logo": "https://www.google.com/s2/favicons?sz=32&domain=mem0.ai"
+     }
+   },
+   "modes": {
+diff --git a/src/memory_bench/memory/__init__.py b/src/memory_bench/memory/__init__.py
+index fe30a2e..638b2e0 100644
+--- a/src/memory_bench/memory/__init__.py
++++ b/src/memory_bench/memory/__init__.py
+@@ -8,6 +8,8 @@ from .mem0 import Mem0MemoryProvider
+ from .mem0_cloud import Mem0CloudMemoryProvider
+ from .hybrid_search import HybridSearchMemoryProvider
+ from .ogham import OghamMemoryProvider
++from .recalld import RecalldMemoryProvider, RecalldRecallMemoryProvider
++from .mem0_oss import Mem0OssMemoryProvider
+ from .supermemory import SupermemoryMemoryProvider
+ 
+ REGISTRY: dict[str, type[MemoryProvider]] = {
+@@ -23,6 +25,9 @@ REGISTRY: dict[str, type[MemoryProvider]] = {
+     "mem0-cloud": Mem0CloudMemoryProvider,
+     "ogham": OghamMemoryProvider,
+     "qdrant": HybridSearchMemoryProvider,
++    "recalld": RecalldMemoryProvider,
++    "recalld-recall": RecalldRecallMemoryProvider,
++    "mem0-oss": Mem0OssMemoryProvider,
+     "supermemory": SupermemoryMemoryProvider,
+ }
+ 

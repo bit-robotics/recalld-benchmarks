@@ -1,0 +1,31 @@
+diff --git a/src/memory_bench/llm/gemini.py b/src/memory_bench/llm/gemini.py
+index 1eea58e..6433440 100644
+--- a/src/memory_bench/llm/gemini.py
++++ b/src/memory_bench/llm/gemini.py
+@@ -1,4 +1,5 @@
+ import logging
++import os
+ import time
+ 
+ from google import genai
+@@ -22,7 +23,19 @@ _RETRY_BASE_DELAY = 5   # seconds — doubles on each attempt (5, 10, 20, 40, 80
+ 
+ class GeminiLLM(LLM):
+     def __init__(self, model: str = "gemini-2.5-flash-lite"):
+-        self._client = genai.Client()
++        # AI Studio API keys are rate-limited per day by usage tier (e.g. 250 RPD
++        # for gemini-3.1-pro at tier 1). Vertex AI uses a separate quota system
++        # with no such tier ladder. Set GEMINI_BACKEND=vertex to route through it.
++        # Auth is via a service account: point GOOGLE_APPLICATION_CREDENTIALS at
++        # the key file (the genai SDK picks it up automatically via ADC).
++        if os.environ.get("GEMINI_BACKEND", "").strip().lower() == "vertex":
++            project = os.environ.get("GOOGLE_CLOUD_PROJECT", "").strip()
++            if not project:
++                raise ValueError("GOOGLE_CLOUD_PROJECT is required when GEMINI_BACKEND=vertex")
++            location = os.environ.get("GOOGLE_CLOUD_LOCATION", "us-central1").strip()
++            self._client = genai.Client(vertexai=True, project=project, location=location)
++        else:
++            self._client = genai.Client()
+         self._model = model
+ 
+     @property

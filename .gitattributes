@@ -1,0 +1,12 @@
+* text=auto eol=lf
+
+*.patch  text eol=lf
+*.py     text eol=lf
+*.md     text eol=lf
+*.json   text eol=lf
+
+*.json.gz binary
+*.gz      binary
+
+# Committed reports are data, not reviewable source.
+results/**/*.json.gz linguist-generated=true

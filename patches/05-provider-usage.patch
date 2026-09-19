@@ -1,0 +1,42 @@
+diff --git a/src/memory_bench/runner.py b/src/memory_bench/runner.py
+index d867826..e39ae7a 100644
+--- a/src/memory_bench/runner.py
++++ b/src/memory_bench/runner.py
+@@ -336,7 +336,7 @@ class EvalRunner:
+                         description=description, answer_llm=mode.llm_id,
+                         judge_llm=self._get_judge(dataset)._llm.model_id, results=[r for r in all_results if r],
+                     )
+-                    self._save(partial)
++                    self._save(partial, memory)
+ 
+                 return all_results
+ 
+@@ -411,7 +411,7 @@ class EvalRunner:
+             judge_llm=self._get_judge(dataset)._llm.model_id,
+             results=results,
+         )
+-        self._save(summary)
++        self._save(summary, memory)
+         memory.cleanup()
+         return summary
+ 
+@@ -444,7 +444,7 @@ class EvalRunner:
+     def _load_previous_ingested_docs(self, dataset: str, split: str, memory: str, mode: str) -> int:
+         return self._load_previous(dataset, split, memory, mode).get("ingested_docs", 0)
+ 
+-    def _save(self, summary: EvalSummary) -> None:
++    def _save(self, summary: EvalSummary, memory: MemoryProvider | None = None) -> None:
+         path = self._output_path(summary.dataset, summary.split, summary.run_name, summary.mode)
+         path.parent.mkdir(parents=True, exist_ok=True)
+         # Always merge: new results overwrite existing ones by query_id, old ones are kept
+@@ -463,6 +463,10 @@ class EvalRunner:
+         ctx_tokens = [r["context_tokens"]   for r in results_dicts if r.get("context_tokens")   is not None]
+         d["avg_retrieve_time_ms"] = round(sum(rec_times)  / len(rec_times),  1) if rec_times  else None
+         d["avg_context_tokens"]   = round(sum(ctx_tokens) / len(ctx_tokens), 1) if ctx_tokens else None
++        if memory is not None and hasattr(memory, "get_provider_usage"):
++            provider_usage = memory.get_provider_usage()
++            if isinstance(provider_usage, dict):
++                d["provider_usage"] = provider_usage
+         d["results"]       = results_dicts
+         path.write_text(json.dumps(d, indent=2))
+         console.print(f"\n[green]Saved → {path}[/green]")
