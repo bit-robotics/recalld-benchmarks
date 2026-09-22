@@ -30,6 +30,10 @@ ones, and so do we.
 | [2026-08-06](results/2026-08-06_locomo_recalld-recall-sources/) | `recalld-recall`, sources mode | **88.7%** (1366/1540) | **242.9** |
 | [2026-09-01](results/2026-09-01_locomo_recalld-search-sources/) | `recalld` (`/memory/search`), sources mode | 88.2% (1359/1540) | 1627.4 |
 
+Each result is for the engine as it was on the run date. The engine is updated
+regularly, so current results may differ slightly; we re-run after changes that
+affect recall.
+
 Same harness, dataset, answer model, judge model, retrieval limit, context mode
 and memory stores. `/memory/recall` runs an LLM selection pass server-side and
 returns only the excerpts it picked; `/memory/search` returns the top-k excerpts
